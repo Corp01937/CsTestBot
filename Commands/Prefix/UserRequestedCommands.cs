@@ -12,81 +12,12 @@ namespace YouTubeTestBot.Commands.Prefix
 {
     public class UserRequestedCommands : BaseCommandModule
     {
-        [Command("image")]
-        [Description("Searches Google Images for the given query.")]
-        public async Task ImageSearch(CommandContext ctx, [RemainingText] string query)
-        {
-            //Clearing the dictionary so we can populate it with new images
-            Program.imageHandler.images.Clear();
-            int IDCount = 0;
-
-            // Replace with your own Custom Search Engine ID and API Key
-
-            string cseId = "CSE-ID-HERE";
-            string apiKey = "API-KEY-HERE";
-
-            //Initialise the API
-
-            var customSearchService = new CustomsearchService(new BaseClientService.Initializer
-            {
-                ApplicationName = "Discord Bot",
-                ApiKey = apiKey,
-            });
-
-            //Create your search request
-
-            var listRequest = customSearchService.Cse.List();
-            listRequest.Cx = cseId;
-            listRequest.Num = 10;
-            listRequest.SearchType = CseResource.ListRequest.SearchTypeEnum.Image;
-            listRequest.Q = query;
-
-            //Execute the search request & get the results
-
-            var search = await listRequest.ExecuteAsync();
-            var results = search.Items;
-
-            //Foreach through the results and add each image link into the dictionary
-            foreach (var result in results)
-            {
-                Program.imageHandler.images.Add(IDCount, result.Link);
-                IDCount++;
-            }
-
-            //If there are no results, then display a error message, else show the images
-            if (results == null || !results.Any())
-            {
-                await ctx.RespondAsync("No results found.");
-                return;
-            }
-            else
-            {
-                //Create the buttons for this embed
-                var previousEmoji = new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":track_previous:"));
-                var previousButton = new DiscordButtonComponent(ButtonStyle.Primary, "previousButton", "Previous", false, previousEmoji);
-
-                var nextEmoji = new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":track_next:"));
-                var nextButton = new DiscordButtonComponent(ButtonStyle.Primary, "nextButton", "Next", false, nextEmoji);
-
-                //Display the First Result
-                var firstResult = results.First();
-
-                var imageMessage = new DiscordMessageBuilder()
-                    .AddEmbed(new DiscordEmbedBuilder()
-                        .WithColor(DiscordColor.Azure)
-                        .WithTitle("Results for: " + query)
-                        .WithImageUrl(firstResult.Link))
-                    .AddComponents(previousButton, nextButton);
-
-                await ctx.Channel.SendMessageAsync(imageMessage);
-            }
-        }
 
         [Command("gpt")]
         public async Task ChatGPT(CommandContext ctx, params string[] message)
         {
             //Initialise the API
-            var api = new OpenAIAPI("API-KEY-HERE");
+            var api = new OpenAIAPI("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");
 
             //Initialise a new Chat
             var chat = api.Chat.CreateConversation();
